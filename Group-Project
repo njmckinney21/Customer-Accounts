@@ -1,1 +1,62 @@
+/*
 
+*/
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+//const for array size
+const int NAME_SIZE = 30;
+const int DATE_SIZE = 11;
+
+//sructure defintion
+struct Customer
+{
+	 char name;
+	 char address;
+	 char CityStateZip;
+	 int telephoneNumber;
+	 double accountBalance;
+	 char lastPayment;
+};
+
+//function prototypes
+void addRecord(fstream &);
+void viewRecord(fstream &);
+void changeRecord(fstream &);
+void deleteRecord(fstream &);
+
+int main()
+{
+	int choice;
+	//display the menu and get choice
+	do
+	{
+		//display menu
+		cout << "\n1. Add a new record\n";
+		cout << "2. View an existing record\n";
+		cout << "3. Change an existing record";
+		cout << "\n4. Exit\n";
+
+		//get users choice
+		cout << "Enter your choice(1-4)\n";
+		cin >> choice;
+
+		//validate the choice
+
+		//process the selection 
+		switch (choice)
+		{
+		case 1:
+			addRecord(inventoryFile);
+			break;
+		case 2:
+			viewRecord(inventoryFile);
+			break;
+		case 3:
+			/*changeRecord(inventoryFile);*/
+			break;
+		}
+	} while (choice != 4);
+	return 0;
+}
