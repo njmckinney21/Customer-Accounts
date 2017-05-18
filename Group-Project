@@ -1,104 +1,224 @@
-/*
-Nathan McKinney and Levi L
-5/21/17
-Customers Accounts 
-RCC
-*/
 #include <iostream>
 #include <fstream>
 using namespace std;
 
-//const for array size
-const int NAME_SIZE = 30;
+//constants for array sizes
+const int DESC_SIZE = 31;
 const int DATE_SIZE = 11;
-const int ADDRESS_SIZE = 60;
-const int CITY_STATE_ZIP = 100;
 
-//sructure defintion
-struct Customer
+//structure definition
+struct Inventory
 {
-	 char name[NAME_SIZE];
-	 char address[ADDRESS_SIZE];
-	 char CityStateZip[CITY_STATE_ZIP];
-	 int telephoneNumber;
-	 double accountBalance;
-	 char lastPayment[DATE_SIZE];
+	char desc[DESC_SIZE];
+	int qty;
+	double wholsesale; 
+	double retail;
+	char date[DATE_SIZE];
 };
 
-//function prototypes
-void addAccount(fstream &);
-void viewAccount(fstream &);
-void changeAccount(fstream &);
-void deleteAccount(fstream &);
-void viewAll(fstream &);
+//prototypes
+void addRecord(fstream &);
+void viewRecord(fstream &);
+void changeRecord(fstream &);
 
 int main()
 {
-	fstream customerAccounts;
+	fstream inventoryFile;
 	int choice;
-	//display the menu and get choice
+	//display the menuand get choice
 	do
 	{
 		//display menu
-		cout << "1. Add a new account\n";
-		cout << "2. View an existing account\n";
-		cout << "3. Change an existing account\n";
-		cout << "4. Delete an existing account\n";
-		cout << "5. View all the accounts\n";
-		cout << "6. Exit\n";
+		cout << "\n1. ADD RECORD\n";
+		cout << "2. VIEW EXISTING RECORD\n";
+		cout << "3. CHANGE EXISTING RECORD\n";
+		cout << "4. EXIT PROGRAM\n";
 
-		//get users choice
-		cout << "Enter your choice(1-6): ";
+		//get user's choice
+		cout << "Enter your choice(1-4)";
 		cin >> choice;
 
 		//validate the choice
-
-		//process the selection 
+		
+		//process the selection
 		switch (choice)
 		{
 		case 1:
-			addAccount(customerAccounts);
+			addRecord(inventoryFile);
 			break;
 		case 2:
-			viewAccount(customerAccounts);
+			viewRecord(inventoryFile);
 			break;
 		case 3:
-			changeAccount(customerAccounts);
+			changeRecord(inventoryFile);
 			break;
-		case 4:
-			deleteAccount(customerAccounts);
-			break;
-		case 5:
-			viewAll(customerAccounts);
-			break;
-
 		}
-	} while (choice != 6);
+	} while (choice != 4);
 	return 0;
 }
 
-void addAccount(fstream & customerFile)
-
+/*
+Function addRecord
+This function gets the data for a record and 
+writes it to the file. 
+Parameter: stream for the file
+*/
+void addRecord(fstream & invFile)
 {
+	//inventory variable to hold input
+	Inventory record;
+
+	//open the file to append to a file in binary format
+	invFile.open("invtry.dat", ios::out | ios::app | ios::binary);
+
+	if (invFile.fail())
+	{
+		cout << "Error opening the file.\n";
+		exit(EXIT_FAILURE);
+	}
+
+	cin.get();
+	cout << "\nEnter the following inventory data:\n";
+	cout << "Description: ";
+	cin.getline(record.desc, DESC_SIZE);
+	cout << "Quantity: ";
+	cin >> record.qty;
+	//validate loop for positive quantity
+	cout << "Wholesale cost: ";
+	cin >> record.wholsesale;
+	//validate loop for positive price 
+	cout << "Retail cost: ";
+	cin >> record.retail;
+	//validate
+	cout << "Date added to inventory(mm/dd/yyyy): ";
+	cin >> record.date;
+
+	//write the record
+	invFile.write(reinterpret_cast<char*>(&record), sizeof(record));
+	if (invFile.fail())
+	{
+		cout << "Error writing record to file.\n";
+	}
+	else
+	{
+		cout << "Record written to file.\n\n";
+	}
+	invFile.close();
 
 }
 
-void viewAccount(fstream & customerFile)
+void viewRecord(fstream & invFile)
 {
+	Inventory record; 
+	long recNum;
+	invFile.open("invtry.dat", ios::in | ios::binary);
+
+	if (invFile.fail())
+	{
+		cout << "Error opening the file.\n";
+		exit(EXIT_FAILURE);
+	}
+
+	//get record number from user
+	cout << "\nEnter the record number of the item: ";
+	cin >> recNum;
+	recNum -= 1;
+
+	//seek to the record
+	invFile.seekg(recNum * sizeof(record), ios::beg);
+	if (invFile.fail())
+	{
+		cout << "\nERROR locating record.\n";
+		invFile.close();
+		return;
+	}
+
+	//read the record
+	invFile.read(reinterpret_cast<char *>(&record), sizeof(record));
+	invFile.close();
+
+	//display the record
+	cout << "Description: ";
+	cout << record.desc << endl;
+	cout << "Quantity: ";
+	cout << record.qty << endl;
+	cout << "Wholesale cost: ";
+	cout << record.wholsesale << endl;
+	cout << "Retail price: ";
+	cout << record.retail << endl;
+	cout << "Date entered into inventory: ";
+	cout << record.date << endl;
+	//cout << "Press any key to continue...";
+	cin.get();
 
 }
 
-void changeAccount(fstream & customerFile)
+void changeRecord(fstream & invFile)
 {
+	Inventory record;
+	long recNum;
 
-}
+	invFile.open("invtry.dat", ios::in | ios::out | ios::binary);
 
-void deleteAccount(fstream & customerFile)
-{
+	if (invFile.fail())
+	{
+		cout << "Error opening the file.\n";
+		exit(EXIT_FAILURE);
+	}
 
-}
+	cout << "Enter the record number of the item to edit: ";
+	cin >> recNum;
+	recNum -= 1;
 
-void viewAll(fstream & customerFile)
-{
+	//seek to the record to read
+	invFile.seekg(recNum * sizeof(record), ios::beg);
+
+	if (invFile.fail())
+	{
+		cout << "\nERROR locating record.\n";
+		invFile.close();
+		return;
+	}
+
+	//read the record
+	invFile.read(reinterpret_cast<char *>(&record), sizeof(record));
+
+	//display the record
+	cout << "Description: ";
+	cout << record.desc << endl;
+	cout << "Quantity: ";
+	cout << record.qty << endl;
+	cout << "Wholesale cost: ";
+	cout << record.wholsesale << endl;
+	cout << "Retail price: ";
+	cout << record.retail << endl;
+	cout << "Date entered into inventory: ";
+	cout << record.retail << endl;
+
+	//get the new data
+	cout << "\nEnter the new inventory data:\n";
+	cin.get();
+	cout << "Description: ";
+	cin.getline(record.desc, DESC_SIZE);
+	cout << "Quantity: ";
+	cin >> record.qty;
+	//validate loop for positive quantity
+	cout << "Wholesale cost: ";
+	cin >> record.wholsesale;
+	//validate loop for positive price 
+	cout << "Retail cost: ";
+	cin >> record.retail;
+	//validate
+	cout << "Date added to inventory(mm/dd/yyyy): ";
+	cin >> record.date;
+
+	//seek to position to write to
+	invFile.seekp(recNum * sizeof(record), ios::beg);
+
+	//write the new data over the old 
+	invFile.write(reinterpret_cast<char *>(&record), sizeof(record));
+
+	//close the file 
+	invFile.close();
 
 }
