@@ -71,3 +71,29 @@ int main()
 	} while (choice != 6);
 	return 0;
 }
+
+void addRecord(fstream &)
+
+{
+
+}
+
+void viewRecord(fstream &)
+{
+
+}
+
+void changeRecord(fstream &)
+{
+
+}
+
+void deleteRecord(fstream &)
+{
+
+}
+
+void viewAll(fstream &)
+{
+
+}
