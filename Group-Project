@@ -29,6 +29,7 @@ void viewAll(fstream &);
 
 int main()
 {
+	fstream customerAccounts;
 	int choice;
 	//display the menu and get choice
 	do
@@ -51,19 +52,19 @@ int main()
 		switch (choice)
 		{
 		case 1:
-			addRecord(inventoryFile);
+			addRecord(customerAccounts);
 			break;
 		case 2:
-			viewRecord(inventoryFile);
+			viewRecord(customerAccounts);
 			break;
 		case 3:
-			changeRecord(inventoryFile);
+			changeRecord(customerAccounts);
 			break;
 		case 4:
-			deleteRecord(inventoryFile);
+			deleteRecord(customerAccounts);
 			break;
 		case 5:
-			viewAll(inventoryFile);
+			viewAll(customerAccounts);
 			break;
 
 		}
