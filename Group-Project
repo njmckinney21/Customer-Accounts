@@ -1,5 +1,5 @@
 /*
-Levi Was Here
+
 */
 #include <iostream>
 #include <fstream>
@@ -25,6 +25,7 @@ void addRecord(fstream &);
 void viewRecord(fstream &);
 void changeRecord(fstream &);
 void deleteRecord(fstream &);
+void viewAll(fstream &);
 
 int main()
 {
@@ -35,8 +36,10 @@ int main()
 		//display menu
 		cout << "\n1. Add a new record\n";
 		cout << "2. View an existing record\n";
-		cout << "3. Change an existing record";
-		cout << "\n4. Exit\n";
+		cout << "3. Change an existing record\n";
+		cout << "4. Delete an existing account\n";
+		cout << "5. View all the accounts\n";
+		cout << "\n6. Exit\n";
 
 		//get users choice
 		cout << "Enter your choice(1-4)\n";
@@ -54,9 +57,16 @@ int main()
 			viewRecord(inventoryFile);
 			break;
 		case 3:
-			/*changeRecord(inventoryFile);*/
+			changeRecord(inventoryFile);
 			break;
+		case 4:
+			deleteRecord(inventoryFile);
+			break;
+		case 5:
+			viewAll(inventoryFile);
+			break;
+
 		}
-	} while (choice != 4);
+	} while (choice != 6);
 	return 0;
 }
