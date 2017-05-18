@@ -1,5 +1,8 @@
 /*
-
+Nathan McKinney and Levi L
+5/21/17
+Customers Accounts 
+RCC
 */
 #include <iostream>
 #include <fstream>
@@ -8,23 +11,25 @@ using namespace std;
 //const for array size
 const int NAME_SIZE = 30;
 const int DATE_SIZE = 11;
+const int ADDRESS_SIZE = 60;
+const int CITY_STATE_ZIP = 100;
 
 //sructure defintion
 struct Customer
 {
-	 char name;
-	 char address;
-	 char CityStateZip;
+	 char name[NAME_SIZE];
+	 char address[ADDRESS_SIZE];
+	 char CityStateZip[CITY_STATE_ZIP];
 	 int telephoneNumber;
 	 double accountBalance;
-	 char lastPayment;
+	 char lastPayment[DATE_SIZE];
 };
 
 //function prototypes
-void addRecord(fstream &);
-void viewRecord(fstream &);
-void changeRecord(fstream &);
-void deleteRecord(fstream &);
+void addAccount(fstream &);
+void viewAccount(fstream &);
+void changeAccount(fstream &);
+void deleteAccount(fstream &);
 void viewAll(fstream &);
 
 int main()
@@ -35,15 +40,15 @@ int main()
 	do
 	{
 		//display menu
-		cout << "\n1. Add a new record\n";
-		cout << "2. View an existing record\n";
-		cout << "3. Change an existing record\n";
+		cout << "1. Add a new account\n";
+		cout << "2. View an existing account\n";
+		cout << "3. Change an existing account\n";
 		cout << "4. Delete an existing account\n";
 		cout << "5. View all the accounts\n";
-		cout << "\n6. Exit\n";
+		cout << "6. Exit\n";
 
 		//get users choice
-		cout << "Enter your choice(1-4)\n";
+		cout << "Enter your choice(1-6): ";
 		cin >> choice;
 
 		//validate the choice
@@ -52,16 +57,16 @@ int main()
 		switch (choice)
 		{
 		case 1:
-			addRecord(customerAccounts);
+			addAccount(customerAccounts);
 			break;
 		case 2:
-			viewRecord(customerAccounts);
+			viewAccount(customerAccounts);
 			break;
 		case 3:
-			changeRecord(customerAccounts);
+			changeAccount(customerAccounts);
 			break;
 		case 4:
-			deleteRecord(customerAccounts);
+			deleteAccount(customerAccounts);
 			break;
 		case 5:
 			viewAll(customerAccounts);
@@ -72,28 +77,28 @@ int main()
 	return 0;
 }
 
-void addRecord(fstream &)
+void addAccount(fstream & customerFile)
 
 {
 
 }
 
-void viewRecord(fstream &)
+void viewAccount(fstream & customerFile)
 {
 
 }
 
-void changeRecord(fstream &)
+void changeAccount(fstream & customerFile)
 {
 
 }
 
-void deleteRecord(fstream &)
+void deleteAccount(fstream & customerFile)
 {
 
 }
 
-void viewAll(fstream &)
+void viewAll(fstream & customerFile)
 {
 
 }
