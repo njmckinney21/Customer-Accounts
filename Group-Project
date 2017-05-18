@@ -1,101 +1,125 @@
+/*
+Nathan McKinney and Levi Leuthold
+Created: 5/17/17
+Modified: 5/18/18 - Added main functions and prototypes
+Group project: Customers Accounts
+Rogue Community College - Computer Science Department - Teacher: Cynthia Patterson
+*/
 #include <iostream>
 #include <fstream>
-using namespace std;
+using std::cout;
+using std::cin;
+using std::endl;
+using std::ios;
+using std::fstream;
 
-//constants for array sizes
-const int DESC_SIZE = 31;
+
+//const for array size
+const int NAME_SIZE = 30;
 const int DATE_SIZE = 11;
+const int ADDRESS_SIZE = 60;
+const int CITY_STATE_ZIP = 100;
 
-//structure definition
-struct Inventory
+//sructure defintion
+struct Customer
 {
-	char desc[DESC_SIZE];
-	int qty;
-	double wholsesale; 
-	double retail;
-	char date[DATE_SIZE];
+	char name[NAME_SIZE];
+	char address[ADDRESS_SIZE];
+	char CityStateZip[CITY_STATE_ZIP];
+	int telephoneNumber;
+	double accountBalance;
+	char lastPayment[DATE_SIZE];
 };
 
-//prototypes
-void addRecord(fstream &);
-void viewRecord(fstream &);
-void changeRecord(fstream &);
+//function prototypes
+void addAccount(fstream &);
+void viewAccount(fstream &);
+void changeAccount(fstream &);
+void deleteAccount(fstream &);
+void viewAll(fstream &);
 
 int main()
 {
-	fstream inventoryFile;
+	fstream customerAccounts;
 	int choice;
-	//display the menuand get choice
+	//display the menu and get choice
 	do
 	{
 		//display menu
-		cout << "\n1. ADD RECORD\n";
-		cout << "2. VIEW EXISTING RECORD\n";
-		cout << "3. CHANGE EXISTING RECORD\n";
-		cout << "4. EXIT PROGRAM\n";
+		cout << "1. Add a new account\n";
+		cout << "2. View an existing account\n";
+		cout << "3. Change an existing account\n";
+		cout << "4. Delete an existing account\n";
+		cout << "5. View all the accounts\n";
+		cout << "6. Exit\n";
 
-		//get user's choice
-		cout << "Enter your choice(1-4)";
+		//get users choice
+		cout << "Enter your choice(1-6): ";
 		cin >> choice;
 
 		//validate the choice
-		
-		//process the selection
+		while (choice < 1 || choice > 6)
+		{
+			cout << "Error re-enter your choice (between 1-6): ";
+			cin >> choice;
+		}
+
+		//process the selection 
 		switch (choice)
 		{
 		case 1:
-			addRecord(inventoryFile);
+			addAccount(customerAccounts);
 			break;
 		case 2:
-			viewRecord(inventoryFile);
+			viewAccount(customerAccounts);
 			break;
 		case 3:
-			changeRecord(inventoryFile);
+			changeAccount(customerAccounts);
 			break;
+		case 4:
+			deleteAccount(customerAccounts);
+			break;
+		case 5:
+			viewAll(customerAccounts);
+			break;
+
 		}
-	} while (choice != 4);
+	} while (choice != 6);
+
 	return 0;
 }
 
-/*
-Function addRecord
-This function gets the data for a record and 
-writes it to the file. 
-Parameter: stream for the file
-*/
-void addRecord(fstream & invFile)
+void addAccount(fstream & customerFile)
 {
 	//inventory variable to hold input
-	Inventory record;
+	Customer account;
 
 	//open the file to append to a file in binary format
-	invFile.open("invtry.dat", ios::out | ios::app | ios::binary);
+	customerFile.open("customer.dat", ios::out | ios::app | ios::binary);
 
-	if (invFile.fail())
+	if (customerFile.fail())
 	{
 		cout << "Error opening the file.\n";
 		exit(EXIT_FAILURE);
 	}
 
 	cin.get();
-	cout << "\nEnter the following inventory data:\n";
-	cout << "Description: ";
-	cin.getline(record.desc, DESC_SIZE);
-	cout << "Quantity: ";
-	cin >> record.qty;
-	//validate loop for positive quantity
-	cout << "Wholesale cost: ";
-	cin >> record.wholsesale;
-	//validate loop for positive price 
-	cout << "Retail cost: ";
-	cin >> record.retail;
-	//validate
-	cout << "Date added to inventory(mm/dd/yyyy): ";
-	cin >> record.date;
+	cout << "\nName (Enter the first name of no more than 29 characters): ";
+	cin.getline(account.name, NAME_SIZE);
+	cout << "Address: ";
+	cin.getline(account.address, ADDRESS_SIZE);
+	cout << "Enter the city, state, and zip: ";
+	cin.getline(account.CityStateZip, CITY_STATE_ZIP);
+	cout << "Telephone Number (No special characters): ";
+	cin >> account.telephoneNumber;
+	cout << "Account Balance: ";
+	cin >> account.accountBalance;
+	cout << "Date of last payment (format: dd/mm/yyyy): ";
+	cin >> account.lastPayment;
 
 	//write the record
-	invFile.write(reinterpret_cast<char*>(&record), sizeof(record));
-	if (invFile.fail())
+	customerFile.write(reinterpret_cast<char*>(&account), sizeof(account));
+	if (customerFile.fail())
 	{
 		cout << "Error writing record to file.\n";
 	}
@@ -103,122 +127,25 @@ void addRecord(fstream & invFile)
 	{
 		cout << "Record written to file.\n\n";
 	}
-	invFile.close();
+	customerFile.close();
+}
+
+void viewAccount(fstream & customerFile)
+{
 
 }
 
-void viewRecord(fstream & invFile)
+void changeAccount(fstream & customerFile)
 {
-	Inventory record; 
-	long recNum;
-	invFile.open("invtry.dat", ios::in | ios::binary);
-
-	if (invFile.fail())
-	{
-		cout << "Error opening the file.\n";
-		exit(EXIT_FAILURE);
-	}
-
-	//get record number from user
-	cout << "\nEnter the record number of the item: ";
-	cin >> recNum;
-	recNum -= 1;
-
-	//seek to the record
-	invFile.seekg(recNum * sizeof(record), ios::beg);
-	if (invFile.fail())
-	{
-		cout << "\nERROR locating record.\n";
-		invFile.close();
-		return;
-	}
-
-	//read the record
-	invFile.read(reinterpret_cast<char *>(&record), sizeof(record));
-	invFile.close();
-
-	//display the record
-	cout << "Description: ";
-	cout << record.desc << endl;
-	cout << "Quantity: ";
-	cout << record.qty << endl;
-	cout << "Wholesale cost: ";
-	cout << record.wholsesale << endl;
-	cout << "Retail price: ";
-	cout << record.retail << endl;
-	cout << "Date entered into inventory: ";
-	cout << record.date << endl;
-	//cout << "Press any key to continue...";
-	cin.get();
 
 }
 
-void changeRecord(fstream & invFile)
+void deleteAccount(fstream & customerFile)
 {
-	Inventory record;
-	long recNum;
 
-	invFile.open("invtry.dat", ios::in | ios::out | ios::binary);
+}
 
-	if (invFile.fail())
-	{
-		cout << "Error opening the file.\n";
-		exit(EXIT_FAILURE);
-	}
-
-	cout << "Enter the record number of the item to edit: ";
-	cin >> recNum;
-	recNum -= 1;
-
-	//seek to the record to read
-	invFile.seekg(recNum * sizeof(record), ios::beg);
-
-	if (invFile.fail())
-	{
-		cout << "\nERROR locating record.\n";
-		invFile.close();
-		return;
-	}
-
-	//read the record
-	invFile.read(reinterpret_cast<char *>(&record), sizeof(record));
-
-	//display the record
-	cout << "Description: ";
-	cout << record.desc << endl;
-	cout << "Quantity: ";
-	cout << record.qty << endl;
-	cout << "Wholesale cost: ";
-	cout << record.wholsesale << endl;
-	cout << "Retail price: ";
-	cout << record.retail << endl;
-	cout << "Date entered into inventory: ";
-	cout << record.retail << endl;
-
-	//get the new data
-	cout << "\nEnter the new inventory data:\n";
-	cin.get();
-	cout << "Description: ";
-	cin.getline(record.desc, DESC_SIZE);
-	cout << "Quantity: ";
-	cin >> record.qty;
-	//validate loop for positive quantity
-	cout << "Wholesale cost: ";
-	cin >> record.wholsesale;
-	//validate loop for positive price 
-	cout << "Retail cost: ";
-	cin >> record.retail;
-	//validate
-	cout << "Date added to inventory(mm/dd/yyyy): ";
-	cin >> record.date;
-
-	//seek to position to write to
-	invFile.seekp(recNum * sizeof(record), ios::beg);
-
-	//write the new data over the old 
-	invFile.write(reinterpret_cast<char *>(&record), sizeof(record));
-
-	//close the file 
-	invFile.close();
+void viewAll(fstream & customerFile)
+{
 
 }
