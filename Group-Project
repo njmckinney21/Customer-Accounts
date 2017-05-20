@@ -1,10 +1,11 @@
 /*
 Nathan McKinney and Levi Leuthold
-Created: 5/17/17
-Modified: 5/20/17 - Completed program functionality but needs polishing.
+Created: 5/16/17 4:00PM
+Modified: 5/20/17 11:12AM - Completed program.
 Group project: Customers Accounts
 Rogue Community College - Computer Science Department - Teacher: Cynthia Patterson
 */
+
 #include <iostream>
 #include <fstream>
 using std::cout;
@@ -15,10 +16,10 @@ using std::fstream;
 
 //const for array size
 const int NAME_SIZE = 30;
-const int DATE_SIZE = 11;
+const int DATE_SIZE = 11;	
 const int ADDRESS_SIZE = 250;
 const int CITY_STATE_ZIP = 250;
-const int PHONE_SIZE = 15;
+const int PHONE_SIZE = 20;	
 
 //sructure defintion
 struct Customer
@@ -122,7 +123,8 @@ void addAccount(fstream & customerFile)
 
 	cout << "Date of last payment (format: dd/mm/yyyy): ";
 	cin >> account.lastPayment;
-	account.isDeleted = false;
+
+	account.isDeleted = false;	//set deleted flag variable to false
 
 	//write the record
 	customerFile.write(reinterpret_cast<char*>(&account), sizeof(account));
@@ -174,7 +176,7 @@ void viewAccount(fstream & customerFile)
 	customerFile.close();
 
 	//ask the user to enter one of the pharses 
-	if (account.isDeleted == false)
+	if (account.isDeleted == false)	//verify the account record hasn't been deleted
 	{
 		cout << "Name: " << account.name << endl;
 		cout << "Address: " << account.address << endl;
@@ -221,33 +223,41 @@ void changeAccount(fstream & customerFile)
 	customerFile.read(reinterpret_cast<char *>(&account), sizeof(account));
 
 	//user inputs to find account they want to change
-	cout << "Name: " << account.name << endl;
-	cout << "Address: " << account.address << endl;
-	cout << "City, state, and zip: " << account.CityStateZip << endl;
-	cout << "Account balance: " << account.accountBalance << endl;
-	cout << "Last payment: " << account.lastPayment << endl;
-	cin.get();
+	if (account.isDeleted == false)
+	{
+		cout << "Name: " << account.name << endl;
+		cout << "Address: " << account.address << endl;
+		cout << "City, state, and zip: " << account.CityStateZip << endl;
+		cout << "Account balance: " << account.accountBalance << endl;
+		cout << "Last payment: " << account.lastPayment << endl;
+		cin.get();
 
-	//the user enters the info for an account
-	cout << "\nName (Enter the first name of no more than 29 characters): ";
-	cin.getline(account.name, NAME_SIZE);
-	cout << "Address: ";
-	cin.getline(account.address, ADDRESS_SIZE);
-	cout << "Enter the city, state, and zip: ";
-	cin.getline(account.CityStateZip, CITY_STATE_ZIP);
-	cout << "Telephone Number (No special characters): ";
-	cin.getline(account.telephoneNumber, PHONE_SIZE);
-	cout << "Account Balance: ";
-	cin >> account.accountBalance;
-	cout << "Date of last payment (format: dd/mm/yyyy): ";
-	cin >> account.lastPayment;
-	
-	//seek to postion ot write
-	customerFile.seekp(accChoice * sizeof(account), ios::beg);
+		//the user enters the info for an account
+		cout << "\nName (Enter the first name of no more than 29 characters): ";
+		cin.getline(account.name, NAME_SIZE);
+		cout << "Address: ";
+		cin.getline(account.address, ADDRESS_SIZE);
+		cout << "Enter the city, state, and zip: ";
+		cin.getline(account.CityStateZip, CITY_STATE_ZIP);
+		cout << "Telephone Number (No special characters): ";
+		cin.getline(account.telephoneNumber, PHONE_SIZE);
+		cout << "Account Balance: ";
+		cin >> account.accountBalance;
+		cout << "Date of last payment (format: dd/mm/yyyy): ";
+		cin >> account.lastPayment;
 
-	//write the new data over the ol data
-	customerFile.write(reinterpret_cast<char *>(&account), sizeof(account));
-	customerFile.close();
+		//seek to postion ot write
+		customerFile.seekp(accChoice * sizeof(account), ios::beg);
+
+		//write the new data over the ol data
+		customerFile.write(reinterpret_cast<char *>(&account), sizeof(account));
+		customerFile.close();
+	}
+	else
+	{
+		cout << "Error: this account record has been deleted." << endl;
+		customerFile.close();
+	}
 }//end of changeAccount
 
 void deleteAccount(fstream & customerFile)
@@ -257,7 +267,7 @@ void deleteAccount(fstream & customerFile)
 
 	//open the file 
 	customerFile.open("customer.dat", ios::in | ios::out | ios::binary);
-	
+
 	//validates that the file opens right 
 	if (customerFile.fail())
 	{
@@ -334,3 +344,124 @@ void viewAll(fstream & customerFile)
 	}
 	customerFile.close();
 }//end of viewAll
+
+/* Console output:
+
+1. Add a new account
+2. View an existing account
+3. Change an existing account
+4. Delete an existing account
+5. View all the accounts
+6. Exit
+Enter your choice(1-6): 5
+Name: levi
+Address: 123 North Ave.
+City, state, and zip: Kansas Arkansa 12345
+Account balance: 103.37
+Last payment: 09/03/2017
+Name: nathan
+Address: 999 road street
+City, state, and zip: Detroit Michigan 55555
+Account balance: 3.5
+Last payment: 01/12/2003
+Name: johnathan
+Address: 098 wilsonVille
+City, state, and zip: Portland OR. 98765
+Account balance: 56030.2
+Last payment: 09/09/1999
+
+1. Add a new account
+2. View an existing account
+3. Change an existing account
+4. Delete an existing account
+5. View all the accounts
+6. Exit
+Enter your choice(1-6): 1
+
+Name (Enter the first name of no more than 29 characters): abraham
+Address: 111
+Enter the city, state, and zip: Central Point Oregon 55555
+Telephone Number (No special characters): 8889991111
+Account Balance: 10.50
+Date of last payment (format: dd/mm/yyyy): 04/05/2017
+Record written to file.
+
+1. Add a new account
+2. View an existing account
+3. Change an existing account
+4. Delete an existing account
+5. View all the accounts
+6. Exit
+Enter your choice(1-6): 2
+Enter the number of the record you would like to review: 2
+Name: nathan
+Address: 999 road street
+City, state, and zip: Detroit Michigan 55555
+Account balance: 3.5
+Last payment: 01/12/2003
+
+1. Add a new account
+2. View an existing account
+3. Change an existing account
+4. Delete an existing account
+5. View all the accounts
+6. Exit
+Enter your choice(1-6): 3
+Enter the record number of the item to edit: 1
+Name: levi
+Address: 123 North Ave.
+City, state, and zip: Kansas Arkansa 12345
+Account balance: 103.37
+Last payment: 09/03/2017
+
+Name (Enter the first name of no more than 29 characters): james
+Address: 719 south yellow street
+Enter the city, state, and zip: Medford OR. 11111
+Telephone Number (No special characters): 5410001111
+Account Balance: 1403.57
+Date of last payment (format: dd/mm/yyyy): 01/04/2016
+
+1. Add a new account
+2. View an existing account
+3. Change an existing account
+4. Delete an existing account
+5. View all the accounts
+6. Exit
+Enter your choice(1-6): 4
+Enter the record number of the record to delete: 2
+
+1. Add a new account
+2. View an existing account
+3. Change an existing account
+4. Delete an existing account
+5. View all the accounts
+6. Exit
+Enter your choice(1-6): 5
+
+Name: james
+Address: 719 south yellow street
+City, state, and zip: Medford OR. 11111
+Account balance: 1403.57
+Last payment: 01/04/2016
+Name: johnathan
+Address: 098 wilsonVille
+City, state, and zip: Portland OR. 98765
+Account balance: 56030.2
+Last payment: 09/09/1999
+Name: abraham
+Address: 111
+City, state, and zip: Central Point Oregon 55555
+Account balance: 10.5
+Last payment: 04/05/2017
+
+1. Add a new account
+2. View an existing account
+3. Change an existing account
+4. Delete an existing account
+5. View all the accounts
+6. Exit
+Enter your choice(1-6): -7
+Error re-enter your choice (between 1-6): 6
+Press any key to continue . . .
+
+*/
