@@ -13,8 +13,6 @@ using std::endl;
 using std::ios;
 using std::fstream;
 
-
-
 //const for array size
 const int NAME_SIZE = 30;
 const int DATE_SIZE = 11;
@@ -85,10 +83,8 @@ int main()
 		case 5:
 			viewAll(customerAccounts);
 			break;
-
 		}
 	} while (choice != 6);
-
 	return 0;
 }
 
@@ -97,32 +93,41 @@ void addAccount(fstream & customerFile)
 	//inventory variable to hold input
 	Customer account;
 
-	//open the file to append to a file in binary format
+	//open the file
 	customerFile.open("customer.dat", ios::out | ios::app | ios::binary);
 
+	//validate that the file opens 
 	if (customerFile.fail())
 	{
 		cout << "Error opening the file.\n";
 		exit(EXIT_FAILURE);
 	}
 
+	//get the inputs from the user for an account
 	cin.get();
 	cout << "\nName (Enter the first name of no more than 29 characters): ";
 	cin.getline(account.name, NAME_SIZE);
+
 	cout << "Address: ";
 	cin.getline(account.address, ADDRESS_SIZE);
+
 	cout << "Enter the city, state, and zip: ";
 	cin.getline(account.CityStateZip, CITY_STATE_ZIP);
+
 	cout << "Telephone Number (No special characters): ";
 	cin.getline(account.telephoneNumber, PHONE_SIZE);
+
 	cout << "Account Balance: ";
 	cin >> account.accountBalance;
+
 	cout << "Date of last payment (format: dd/mm/yyyy): ";
 	cin >> account.lastPayment;
 	account.isDeleted = false;
 
 	//write the record
 	customerFile.write(reinterpret_cast<char*>(&account), sizeof(account));
+
+	//validate the record was written correctly
 	if (customerFile.fail())
 	{
 		cout << "Error writing record to file.\n";
@@ -132,25 +137,31 @@ void addAccount(fstream & customerFile)
 		cout << "Record written to file.\n";
 	}
 	customerFile.close();
-}
+}//end of addAccount
 
 void viewAccount(fstream & customerFile)
 {
 	int recordNum = 0;
 	Customer account;
+
+	//open the file 
 	customerFile.open("customer.dat", ios::in | ios::binary);
 
+	//validate that the file open correct
 	if (customerFile.fail())
 	{
 		cout << "Error opening the file.\n";
 		exit(EXIT_FAILURE);
 	}
-
+	//Ask the user to input a number to view the account 
 	cout << "Enter the number of the record you would like to review: ";
 	cin >> recordNum;
 	recordNum -= 1;
 
+	//seek to the account 
 	customerFile.seekg(recordNum * sizeof(Customer), ios::beg);
+
+	//validate that the file is found correctly 
 	if (customerFile.fail())
 	{
 		cout << "\nError locating record.\n";
@@ -158,9 +169,11 @@ void viewAccount(fstream & customerFile)
 		return;
 	}
 
+	//read the account 
 	customerFile.read(reinterpret_cast<char *>(&account), sizeof(account));
 	customerFile.close();
 
+	//ask the user to enter one of the pharses 
 	if (account.isDeleted == false)
 	{
 		cout << "Name: " << account.name << endl;
@@ -171,28 +184,32 @@ void viewAccount(fstream & customerFile)
 	}
 	else
 		cout << "Error: this record has been deleted." << endl;
-	
-}
+}//end of viewAccount 
 
 void changeAccount(fstream & customerFile)
 {
 	Customer account;
 	int accChoice;
 
+	//open the file
 	customerFile.open("customer.dat", ios::in | ios::out | ios::binary);
 
+	//validate if file opens correctly
 	if (customerFile.fail())
 	{
 		cout << "Error opening the file.\n";
 		exit(EXIT_FAILURE);
 	}
 
+	//ask the user to enter the record number to edit 
 	cout << "Enter the record number of the item to edit: ";
 	cin >> accChoice;
 	accChoice -= 1;
 
+	//seek to the record to read
 	customerFile.seekg(accChoice * sizeof(account), ios::beg);
 
+	//validate to see if file is found
 	if (customerFile.fail())
 	{
 		cout << "\nERROR locating record.\n";
@@ -200,15 +217,18 @@ void changeAccount(fstream & customerFile)
 		return;
 	}
 
+	//read the record
 	customerFile.read(reinterpret_cast<char *>(&account), sizeof(account));
 
+	//user inputs to find account they want to change
 	cout << "Name: " << account.name << endl;
 	cout << "Address: " << account.address << endl;
 	cout << "City, state, and zip: " << account.CityStateZip << endl;
 	cout << "Account balance: " << account.accountBalance << endl;
 	cout << "Last payment: " << account.lastPayment << endl;
-
 	cin.get();
+
+	//the user enters the info for an account
 	cout << "\nName (Enter the first name of no more than 29 characters): ";
 	cin.getline(account.name, NAME_SIZE);
 	cout << "Address: ";
@@ -221,54 +241,64 @@ void changeAccount(fstream & customerFile)
 	cin >> account.accountBalance;
 	cout << "Date of last payment (format: dd/mm/yyyy): ";
 	cin >> account.lastPayment;
-
+	
+	//seek to postion ot write
 	customerFile.seekp(accChoice * sizeof(account), ios::beg);
 
+	//write the new data over the ol data
 	customerFile.write(reinterpret_cast<char *>(&account), sizeof(account));
 	customerFile.close();
-
-}
+}//end of changeAccount
 
 void deleteAccount(fstream & customerFile)
 {
 	Customer account;
 	int accChoice;
 
+	//open the file 
 	customerFile.open("customer.dat", ios::in | ios::out | ios::binary);
-
+	
+	//validates that the file opens right 
 	if (customerFile.fail())
 	{
 		cout << "Error opening the file.\n";
 		exit(EXIT_FAILURE);
 	}
 
+	//ask the user to enter record number
 	cout << "Enter the record number of the record to delete: ";
 	cin >> accChoice;
 	accChoice -= 1;
 
+	//seek to the record to read
 	customerFile.seekg(accChoice * sizeof(account), ios::beg);
 
+	//validates that the file locates right
 	if (customerFile.fail())
 	{
 		cout << "\nERROR locating record.\n";
 		customerFile.close();
 		return;
 	}
-
 	account.isDeleted = true;
 
+	//seek to the position to write
 	customerFile.seekp(accChoice * sizeof(account), ios::beg);
+
+	//writes the new data over the old
 	customerFile.write(reinterpret_cast<char *>(&account), sizeof(account));
 	customerFile.close();
-}
+}//end of deleteAccount
 
 void viewAll(fstream & customerFile)
 {
 	Customer account;
 	int count = 0;
 
+	//opens the file
 	customerFile.open("customer.dat", ios::binary | ios::ate | ios::in);
 
+	//validate the file opens right
 	if (customerFile.fail())
 	{
 		cout << "Error opening the file.\n";
@@ -277,7 +307,10 @@ void viewAll(fstream & customerFile)
 
 	while (!customerFile.eof())
 	{
+		//seek to the account
 		customerFile.seekg(count * sizeof(Customer), ios::beg);
+
+		//validate that the location is found
 		if (customerFile.fail())
 		{
 			cout << "\nError locating record.\n";
@@ -285,8 +318,10 @@ void viewAll(fstream & customerFile)
 			return;
 		}
 
+		//read the record
 		customerFile.read(reinterpret_cast<char *>(&account), sizeof(account));
 
+		//displays the content of the struct Customers
 		if (account.isDeleted == false)
 		{
 			cout << "Name: " << account.name << endl;
@@ -295,8 +330,7 @@ void viewAll(fstream & customerFile)
 			cout << "Account balance: " << account.accountBalance << endl;
 			cout << "Last payment: " << account.lastPayment << endl;
 		}
-	
 		count++;
 	}
 	customerFile.close();
-}
+}//end of viewAll
