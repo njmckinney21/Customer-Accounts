@@ -1,7 +1,7 @@
 /*
 Nathan McKinney and Levi Leuthold
 Created: 5/17/17
-Modified: 5/20/17 - Completed display all function
+Modified: 5/20/17 - Completed program functionality but needs polishing.
 Group project: Customers Accounts
 Rogue Community College - Computer Science Department - Teacher: Cynthia Patterson
 */
@@ -31,6 +31,7 @@ struct Customer
 	char telephoneNumber[PHONE_SIZE];
 	double accountBalance;
 	char lastPayment[DATE_SIZE];
+	bool isDeleted = false;
 };
 
 //function prototypes
@@ -118,6 +119,7 @@ void addAccount(fstream & customerFile)
 	cin >> account.accountBalance;
 	cout << "Date of last payment (format: dd/mm/yyyy): ";
 	cin >> account.lastPayment;
+	account.isDeleted = false;
 
 	//write the record
 	customerFile.write(reinterpret_cast<char*>(&account), sizeof(account));
@@ -159,11 +161,16 @@ void viewAccount(fstream & customerFile)
 	customerFile.read(reinterpret_cast<char *>(&account), sizeof(account));
 	customerFile.close();
 
-	cout << "Name: " << account.name << endl;
-	cout << "Address: " << account.address << endl;
-	cout << "City, state, and zip: " << account.CityStateZip << endl;
-	cout << "Account balance: " << account.accountBalance << endl;
-	cout << "Last payment: " << account.lastPayment << endl;
+	if (account.isDeleted == false)
+	{
+		cout << "Name: " << account.name << endl;
+		cout << "Address: " << account.address << endl;
+		cout << "City, state, and zip: " << account.CityStateZip << endl;
+		cout << "Account balance: " << account.accountBalance << endl;
+		cout << "Last payment: " << account.lastPayment << endl;
+	}
+	else
+		cout << "Error: this record has been deleted." << endl;
 	
 }
 
@@ -224,7 +231,35 @@ void changeAccount(fstream & customerFile)
 
 void deleteAccount(fstream & customerFile)
 {
+	Customer account;
+	int accChoice;
 
+	customerFile.open("customer.dat", ios::in | ios::out | ios::binary);
+
+	if (customerFile.fail())
+	{
+		cout << "Error opening the file.\n";
+		exit(EXIT_FAILURE);
+	}
+
+	cout << "Enter the record number of the record to delete: ";
+	cin >> accChoice;
+	accChoice -= 1;
+
+	customerFile.seekg(accChoice * sizeof(account), ios::beg);
+
+	if (customerFile.fail())
+	{
+		cout << "\nERROR locating record.\n";
+		customerFile.close();
+		return;
+	}
+
+	account.isDeleted = true;
+
+	customerFile.seekp(accChoice * sizeof(account), ios::beg);
+	customerFile.write(reinterpret_cast<char *>(&account), sizeof(account));
+	customerFile.close();
 }
 
 void viewAll(fstream & customerFile)
@@ -251,14 +286,16 @@ void viewAll(fstream & customerFile)
 		}
 
 		customerFile.read(reinterpret_cast<char *>(&account), sizeof(account));
+
+		if (account.isDeleted == false)
+		{
+			cout << "Name: " << account.name << endl;
+			cout << "Address: " << account.address << endl;
+			cout << "City, state, and zip: " << account.CityStateZip << endl;
+			cout << "Account balance: " << account.accountBalance << endl;
+			cout << "Last payment: " << account.lastPayment << endl;
+		}
 	
-
-		cout << "Name: " << account.name << endl;
-		cout << "Address: " << account.address << endl;
-		cout << "City, state, and zip: " << account.CityStateZip << endl;
-		cout << "Account balance: " << account.accountBalance << endl;
-		cout << "Last payment: " << account.lastPayment << endl;
-
 		count++;
 	}
 	customerFile.close();
