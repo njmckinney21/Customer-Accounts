@@ -1,7 +1,7 @@
 /*
 Nathan McKinney and Levi Leuthold
 Created: 5/17/17
-Modified: 5/19/17 - The last function isn't working yet
+Modified: 5/20/17 - Completed display all function
 Group project: Customers Accounts
 Rogue Community College - Computer Science Department - Teacher: Cynthia Patterson
 */
@@ -12,6 +12,7 @@ using std::cin;
 using std::endl;
 using std::ios;
 using std::fstream;
+
 
 
 //const for array size
@@ -229,8 +230,9 @@ void deleteAccount(fstream & customerFile)
 void viewAll(fstream & customerFile)
 {
 	Customer account;
+	int count = 0;
 
-	customerFile.open("customer.dat", ios::in | ios::binary);
+	customerFile.open("customer.dat", ios::binary | ios::ate | ios::in);
 
 	if (customerFile.fail())
 	{
@@ -238,19 +240,26 @@ void viewAll(fstream & customerFile)
 		exit(EXIT_FAILURE);
 	}
 
-	customerFile.seekg(ios::beg);
+	while (!customerFile.eof())
+	{
+		customerFile.seekg(count * sizeof(Customer), ios::beg);
+		if (customerFile.fail())
+		{
+			cout << "\nError locating record.\n";
+			customerFile.close();
+			return;
+		}
 
-	customerFile.read(reinterpret_cast<char *>(&account), sizeof(customerFile)); 
-	customerFile.close;
+		customerFile.read(reinterpret_cast<char *>(&account), sizeof(account));
+	
 
-	while(!customerFile)
-	{	
 		cout << "Name: " << account.name << endl;
 		cout << "Address: " << account.address << endl;
 		cout << "City, state, and zip: " << account.CityStateZip << endl;
 		cout << "Account balance: " << account.accountBalance << endl;
 		cout << "Last payment: " << account.lastPayment << endl;
-	}
 
-	
+		count++;
+	}
+	customerFile.close();
 }
