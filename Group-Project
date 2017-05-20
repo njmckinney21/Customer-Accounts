@@ -1,7 +1,7 @@
 /*
 Nathan McKinney and Levi Leuthold
 Created: 5/17/17
-Modified: 5/18/18 - Added main functions and prototypes
+Modified: 5/19/18 - Working on the view record function
 Group project: Customers Accounts
 Rogue Community College - Computer Science Department - Teacher: Cynthia Patterson
 */
@@ -17,8 +17,9 @@ using std::fstream;
 //const for array size
 const int NAME_SIZE = 30;
 const int DATE_SIZE = 11;
-const int ADDRESS_SIZE = 60;
-const int CITY_STATE_ZIP = 100;
+const int ADDRESS_SIZE = 250;
+const int CITY_STATE_ZIP = 250;
+const int PHONE_SIZE = 15;
 
 //sructure defintion
 struct Customer
@@ -26,7 +27,7 @@ struct Customer
 	char name[NAME_SIZE];
 	char address[ADDRESS_SIZE];
 	char CityStateZip[CITY_STATE_ZIP];
-	int telephoneNumber;
+	char telephoneNumber[PHONE_SIZE];
 	double accountBalance;
 	char lastPayment[DATE_SIZE];
 };
@@ -111,7 +112,7 @@ void addAccount(fstream & customerFile)
 	cout << "Enter the city, state, and zip: ";
 	cin.getline(account.CityStateZip, CITY_STATE_ZIP);
 	cout << "Telephone Number (No special characters): ";
-	cin >> account.telephoneNumber;
+	cin.getline(account.telephoneNumber, PHONE_SIZE);
 	cout << "Account Balance: ";
 	cin >> account.accountBalance;
 	cout << "Date of last payment (format: dd/mm/yyyy): ";
@@ -125,14 +126,44 @@ void addAccount(fstream & customerFile)
 	}
 	else
 	{
-		cout << "Record written to file.\n\n";
+		cout << "Record written to file.\n";
 	}
 	customerFile.close();
 }
 
 void viewAccount(fstream & customerFile)
 {
+	int choice = 0;
+	Customer account;
+	customerFile.open("customer.dat", ios::in | ios::binary);
 
+	if (customerFile.fail())
+	{
+		cout << "Error opening the file.\n";
+		exit(EXIT_FAILURE);
+	}
+
+	cout << "Enter the number of the record you would like to review: ";
+	cin >> choice;
+	choice -= 1;
+
+	customerFile.seekg(choice * sizeof(Customer), ios::beg);
+	if (customerFile.fail())
+	{
+		cout << "\nError locating record.\n";
+		customerFile.close();
+		return;
+	}
+
+	customerFile.read(reinterpret_cast<char *>(&account), sizeof(account));
+	customerFile.close();
+
+	cout << "Name: " << account.name << endl;
+	cout << "Address: " << account.address << endl;
+	cout << "City, state, and zip: " << account.CityStateZip << endl;
+	cout << "Account balance: " << account.accountBalance << endl;
+	cout << "Last payment: " << account.lastPayment << endl;
+	
 }
 
 void changeAccount(fstream & customerFile)
